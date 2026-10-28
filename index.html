@@ -5,9 +5,21 @@
     <!-- 移动端视口：不允许用户缩放，用户需要选择合适的设备 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
     <meta name="description" content="蒂芙尼蓝主题舒尔特方格：经典方格、不规则、鹅卵石、蜂巢、圆环五种形态，支持 PC 与移动端 H5 的注意力训练工具" />
+    <!--
+      将WebApp添加到主屏幕后以全屏、无浏览器UI的方式运行，接近原生应用体验
+      apple-mobile-web-app-capable：设为yes时，iOS Safari会将WebApp视为独立应用启动
+      -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- Android Chrome 全屏 -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <!-- status-bar-style：控制状态栏样式（default、black、black-translucent），需与页面背景协调 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <!-- 主题色 theme-color：Chrome、Edge等浏览器会将其用于地址栏背景色 主题色应与品牌主色一致，避免频繁更改 -->
     <meta name="theme-color" content="#0ABAB5" />
     <title>舒尔特方格 · 注意力训练</title>
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <!-- iOS设备专用，建议尺寸为180x180 -->
+    <link rel="apple-touch-icon" href="assets/favicon.png" />
     <!-- 独立样式目录：全部视觉样式集中于 css/style.css -->
     <link rel="stylesheet" href="css/style.css" />
   </head>
@@ -16,7 +28,6 @@
     <!-- 应用主容器：标题栏 / 统计条 / 方格画板 / 操作按钮     -->
     <!-- ================================================== -->
     <div class="app" id="app">
-
       <!-- ========== 顶部标题栏：品牌名 + 训练说明 ========== -->
       <header class="app-header">
         <h1 class="app-title">
