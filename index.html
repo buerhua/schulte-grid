@@ -2,32 +2,156 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="扣子编程，你的 AI 开发伙伴已就位" />
-    <title>扣子编程 - AI 开发伙伴</title>
-    <link rel="stylesheet" href="/styles/main.css" />
+    <!-- 移动端视口：允许用户缩放，保证数字训练时可看清 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="蒂芙尼蓝主题舒尔特方格：经典方格、不规则、鹅卵石、蜂巢、圆环五种形态，支持 PC 与移动端 H5 的注意力训练工具" />
+    <meta name="theme-color" content="#0ABAB5" />
+    <title>舒尔特方格 · 注意力训练</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <!-- 独立样式目录：全部视觉样式集中于 css/style.css -->
+    <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <div id="app">
-      <main class="main-wrapper">
-        <div class="content-container">
-          <img
-            src="https://lf-coze-web-cdn.coze.cn/obj/eden-cn/lm-lgvj/ljhwZthlaukjlkulzlp/coze-coding/icon/coze-coding.gif"
-            alt="扣子编程 Logo"
-            class="logo-image"
-          />
-          <div>
-            <div class="text-container">
-              <h1 class="heading">
-                应用开发中
-              </h1>
-              <p class="description">
-                请稍后，页面即将呈现
-              </p>
-            </div>
-          </div>
+    <!-- ================================================== -->
+    <!-- 应用主容器：标题栏 / 统计条 / 方格画板 / 操作按钮     -->
+    <!-- ================================================== -->
+    <div class="app" id="app">
+
+      <!-- ========== 顶部标题栏：品牌名 + 训练说明 ========== -->
+      <header class="app-header">
+        <h1 class="app-title">
+          <span class="app-title__mark" aria-hidden="true"></span>
+          舒尔特方格
+        </h1>
+        <p class="app-subtitle">从数字 <strong>1</strong> 开始，按从小到大的顺序依次点击</p>
+      </header>
+
+      <!-- ========== 实时统计条：用时 / 目标 / 连对 / 正确 / 错误 ========== -->
+      <section class="stats-bar" aria-label="训练数据统计">
+        <div class="stat-card stat-card--accent">
+          <span class="stat-card__label">用时</span>
+          <span class="stat-card__value"><span id="statTime">0.0</span><small>s</small></span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__label">目标</span>
+          <span class="stat-card__value"><span id="statTarget">1</span></span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__label">连对</span>
+          <span class="stat-card__value" id="statStreak">0</span>
+        </div>
+        <div class="stat-card stat-card--ok">
+          <span class="stat-card__label">正确</span>
+          <span class="stat-card__value" id="statCorrect">0</span>
+        </div>
+        <div class="stat-card stat-card--err">
+          <span class="stat-card__label">错误</span>
+          <span class="stat-card__value" id="statWrong">0</span>
+        </div>
+      </section>
+
+      <!-- ========== 方格画板：五种形态均渲染到 #board（保持正方形） ========== -->
+      <main class="board-stage">
+        <div class="board-frame">
+          <div id="board" class="board" aria-label="舒尔特方格画板"></div>
+          <!-- 开始前的引导遮罩：首次点击数字后自动消失 -->
+          <div class="board-hint" id="boardHint">点击数字 <b>1</b> 开始计时</div>
         </div>
       </main>
+
+      <!-- ========== 底部操作区：模式选择 / 重新开始 ========== -->
+      <footer class="actions">
+        <button type="button" class="btn btn--ghost" id="btnOpenMode">模式选择</button>
+        <button type="button" class="btn btn--primary" id="btnRestart">重新开始</button>
+      </footer>
     </div>
+
+    <!-- ================================================== -->
+    <!-- 模式选择弹框：格子数量（4x4 ~ 9x9）+ 方格类型（5 种） -->
+    <!-- ================================================== -->
+    <div class="modal-mask" id="modeModal" hidden>
+      <div class="modal modal--mode" role="dialog" aria-modal="true" aria-labelledby="modeTitle">
+        <h2 class="modal__title" id="modeTitle">模式选择</h2>
+
+        <!-- 选项组一：格子数量 -->
+        <fieldset class="opt-group">
+          <legend class="opt-group__label">格子数量</legend>
+          <div class="opt-group__options" id="sizeOptions">
+            <!-- 4×4 ~ 9×9 单选项由 js/ui.js 根据配置动态渲染 -->
+          </div>
+          <!-- 小屏设备（最小物理宽高 &lt; 600px）禁用 7×7 及以上时显示的提示 -->
+          <p class="opt-group__tip" id="sizeTip" hidden>当前设备屏幕较小，格子数量最大支持 6×6</p>
+        </fieldset>
+
+        <!-- 选项组二：方格类型 -->
+        <fieldset class="opt-group">
+          <legend class="opt-group__label">方格类型</legend>
+          <div class="opt-group__options" id="typeOptions">
+            <!-- 经典方格 / 不规则 / 鹅卵石 / 蜂巢 / 圆环 由 js/ui.js 动态渲染 -->
+          </div>
+        </fieldset>
+
+        <!-- 弹框底部操作按钮 -->
+        <div class="modal__footer">
+          <button type="button" class="btn btn--ghost btn--block" id="btnModeCancel">取消</button>
+          <button type="button" class="btn btn--primary btn--block" id="btnModeConfirm">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================== -->
+    <!-- 结果展示弹框：完成用时（整数秒）+ 成绩明细 + 再来一局  -->
+    <!-- ================================================== -->
+    <div class="modal-mask" id="resultModal" hidden>
+      <div class="modal modal--result" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+        <!-- 参考稿指定的鼓掌表情 -->
+        <div class="result-clap" aria-hidden="true">&#128079;</div>
+        <h2 class="modal__title" id="resultTitle">全部点击完成</h2>
+        <p class="result-time">用时 <strong id="resultSeconds">0</strong> 秒</p>
+
+        <!-- 成绩明细：总正确 / 总错误 / 最高连对 -->
+        <dl class="result-grid">
+          <div class="result-grid__item">
+            <dt>总正确</dt>
+            <dd id="resultCorrect" class="is-ok">0</dd>
+          </div>
+          <div class="result-grid__item">
+            <dt>总错误</dt>
+            <dd id="resultWrong" class="is-err">0</dd>
+          </div>
+          <div class="result-grid__item result-grid__item--full">
+            <dt>最高连对</dt>
+            <dd id="resultMaxStreak">0</dd>
+          </div>
+        </dl>
+
+        <button type="button" class="btn btn--primary btn--block" id="btnPlayAgain">再来一局</button>
+        <p class="result-tip">关闭弹框将自动按当前模式重新开始</p>
+      </div>
+    </div>
+
+    <!-- ================================================== -->
+    <!-- 脚本区（经典脚本顺序加载，无构建步骤，支持 file:// 直开）-->
+    <!-- 1. config   全局配置：选项、色盘、设备判定阈值          -->
+    <!-- 2. audio    音效池：叮 / 咚（assets/sounds/*.wav）     -->
+    <!-- 3. voronoi  几何工具：半平面裁切生成 Voronoi 多边形    -->
+    <!-- 4. boards   五种方格形态渲染器注册表                   -->
+    <!-- 5. classic / irregular / cobble / honey / ring 渲染器  -->
+    <!-- 6. game     游戏核心：状态机、计时、判定、连击          -->
+    <!-- 7. ui       模式选择弹框、结果弹框、统计条渲染          -->
+    <!-- 8. main     启动入口：初始化、响应式监听                -->
+    <!-- ================================================== -->
+    <script src="js/config.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/voronoi.js"></script>
+    <script src="js/boards.js"></script>
+    <script src="js/board-classic.js"></script>
+    <script src="js/board-irregular.js"></script>
+    <script src="js/board-cobble.js"></script>
+    <script src="js/board-honey.js"></script>
+    <script src="js/board-ring.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
   </body>
 </html>

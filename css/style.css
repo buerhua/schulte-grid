@@ -1,0 +1,752 @@
+/* ==========================================================================
+   舒尔特方格 · 样式表
+   主题：蒂芙尼蓝（Tiffany Blue #0ABAB5）
+   分组：
+     1. 设计令牌与基础重置
+     2. 页面骨架（app / header）
+     3. 实时统计条（stats-bar）
+     4. 方格画板舞台（board-stage / board-frame）
+     5. 经典方格（CSS Grid 单元格）
+     6. SVG 方格通用样式（不规则 / 鹅卵石 / 蜂巢 / 圆环）
+     7. 点击反馈动效（正确弹跳 / 错误抖动 / 完成态）
+     8. 底部操作按钮（actions / btn）
+     9. 弹框通用样式（modal-mask / modal）
+    10. 模式选择弹框（自定义 radio）
+    11. 结果展示弹框
+    12. 响应式适配（移动端 H5）
+   ========================================================================== */
+
+/* ==========================================================================
+   1. 设计令牌与基础重置
+   ========================================================================== */
+:root {
+  /* 品牌色 */
+  --tiffany: #0ABAB5;          /* 主色：蒂芙尼蓝 */
+  --tiffany-dark: #069691;     /* 按压 / 悬停深色 */
+  --tiffany-soft: #E6F7F6;     /* 浅底：徽章 / 选中行 */
+  --ink-teal: #2B7A70;         /* 墨绿青：不规则等形态描边 */
+  /* 中性色 */
+  --bg-page: #F6FAFA;          /* 页面近白淡青底 */
+  --bg-card: #FFFFFF;          /* 卡片白 */
+  --text-main: #1F2D2D;        /* 主文字 */
+  --text-sub: #5C6B6A;         /* 次要文字 */
+  --text-disabled: #A9B7B6;    /* 禁用文字 */
+  --line: #DDECEB;             /* 极淡分隔线 */
+  /* 反馈色 */
+  --correct-tint: rgba(10, 186, 181, .14);
+  --wrong: #E05A4E;            /* 错误泛红 */
+  --wrong-soft: rgba(224, 90, 78, .12);
+  /* 形状与阴影 */
+  --radius-card: 16px;
+  --radius-btn: 12px;
+  --radius-modal: 20px;
+  --shadow-card: 0 4px 18px rgba(13, 95, 92, .06);
+  --shadow-modal: 0 20px 60px rgba(13, 95, 92, .18);
+  /* 动效：轻快、短促、带回弹 */
+  --ease-out-back: cubic-bezier(.22, 1, .36, 1);
+  /* 字体 */
+  --font-cn: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Source Han Sans SC", sans-serif;
+  --font-num: "DIN Alternate", "Helvetica Neue", Arial, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  font-family: var(--font-cn);
+  color: var(--text-main);
+  /* 极淡的纸面渐变，避免大面积纯色的呆板 */
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #EAF8F7 0%, rgba(234, 248, 247, 0) 60%),
+    var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+/* ==========================================================================
+   2. 页面骨架：纵向单栏居中
+   ========================================================================== */
+.app {
+  width: min(100%, 680px);
+  margin: 0 auto;
+  padding: 20px 20px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 100dvh;
+}
+
+.app-header {
+  text-align: center;
+}
+
+/* 标题前的小色点，强化品牌标识 */
+.app-title {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-title__mark {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  background: var(--tiffany);
+  box-shadow: 0 0 0 4px var(--tiffany-soft);
+}
+
+.app-subtitle {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+.app-subtitle strong {
+  color: var(--tiffany-dark);
+  font-size: 15px;
+}
+
+/* ==========================================================================
+   3. 实时统计条：五张等宽数据小卡
+   ========================================================================== */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 10px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: background .2s var(--ease-out-back);
+}
+
+.stat-card__label {
+  font-size: 12px;
+  color: var(--text-sub);
+}
+
+.stat-card__value {
+  font-family: var(--font-num);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1.2;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-card__value small {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-sub);
+  margin-left: 1px;
+}
+
+/* 计时卡在游戏进行中以蒂芙尼浅底强调 */
+.stat-card--accent.is-running {
+  background: var(--tiffany-soft);
+}
+
+.stat-card--accent.is-running .stat-card__value {
+  color: var(--tiffany-dark);
+}
+
+/* 正确 / 错误计数跳字动画的钩子类 */
+.stat-card__value.bump {
+  animation: bump .28s var(--ease-out-back);
+}
+
+.stat-card--ok .stat-card__value { color: #2E7D5B; }
+.stat-card--err .stat-card__value { color: var(--wrong); }
+
+@keyframes bump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+
+/* ==========================================================================
+   4. 方格画板舞台：永远保持正方形并居中
+   ========================================================================== */
+.board-stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+.board-frame {
+  position: relative;
+  /* 宽 = 视口宽 92%、高度留白后、最大 620px 三者取最小，保证正方形完整可见 */
+  width: min(92vw, calc(100dvh - 268px), 620px);
+  aspect-ratio: 1 / 1;
+  background: var(--bg-card);
+  border-radius: 20px;
+  box-shadow: var(--shadow-card);
+  padding: 10px;
+}
+
+.board {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* 开始前的轻提示，首次点击后由 JS 隐藏 */
+.board-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  background: rgba(31, 45, 45, .72);
+  color: #fff;
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity .25s ease;
+}
+
+.board-hint b {
+  color: var(--tiffany);
+  font-family: var(--font-num);
+  font-size: 15px;
+}
+
+.board-hint.is-hidden {
+  opacity: 0;
+}
+
+/* ==========================================================================
+   5. 经典方格：严格网格，白底细分隔线
+   ========================================================================== */
+.board--classic {
+  display: grid;
+  /* 行列数由 JS 写入 CSS 变量 --n */
+  grid-template-columns: repeat(var(--n, 4), 1fr);
+  grid-template-rows: repeat(var(--n, 4), 1fr);
+  gap: 1px;
+  background: #B9DCD9;                 /* 缝隙色：淡蒂芙尼青 */
+  border: 1.5px solid var(--tiffany);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cell-classic {
+  position: relative;
+  background: var(--bg-card);
+  border: none;
+  /* 字号 = 单格宽度的 42%（容器查询单位 cqw） */
+  font-size: calc(42cqi / var(--n, 4));
+  font-family: var(--font-num);
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: background .18s ease, color .18s ease, transform .16s var(--ease-out-back);
+  user-select: none;
+}
+
+/* 经典方格容器作为字号查询容器 */
+.board--classic {
+  container-type: inline-size;
+}
+
+.cell-classic:active {
+  background: var(--tiffany-soft);
+}
+
+/* 经典方格已找到：浅青底 + 深青数字 */
+.cell-classic.is-found {
+  background: var(--tiffany-soft);
+  color: var(--tiffany-dark) !important;
+}
+
+/* ==========================================================================
+   6. SVG 方格通用样式（不规则 / 鹅卵石 / 蜂巢 / 圆环）
+   ========================================================================== */
+.board--svg {
+  padding: 0;
+}
+
+.board--svg svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* 每个可点击的形状都是 <g class="cell" data-num="x"> */
+.svg-cell {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.svg-cell text {
+  font-family: var(--font-num);
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;       /* 文字不挡点击，事件统一走 <g> */
+  user-select: none;
+}
+
+/* 不规则：白底 + 墨绿青描边 */
+.skin-irregular .cell-shape {
+  fill: #FFFFFF;
+  stroke: var(--ink-teal);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  transition: fill .18s ease;
+}
+
+/* 蜂巢：透明底 + 墨绿青描边 */
+.skin-honey .cell-shape {
+  fill: #FFFFFF;
+  stroke: var(--ink-teal);
+  stroke-width: 4;
+  stroke-linejoin: round;
+  transition: fill .18s ease;
+}
+
+/* 圆环：白底 + 墨绿青描边 */
+.skin-ring .cell-shape {
+  fill: #FFFFFF;
+  stroke: var(--ink-teal);
+  stroke-width: 3;
+  transition: fill .18s ease;
+}
+
+/* 鹅卵石：马卡龙填充、无描边 */
+.skin-cobble .cell-shape {
+  stroke: none;
+  transition: opacity .18s ease;
+}
+
+/* 形状轻微的按压缩放反馈（通过 transform-origin 由 JS 按重心设置） */
+.svg-cell .cell-hit {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform .16s var(--ease-out-back);
+}
+
+/* ==========================================================================
+   7. 点击反馈：正确弹跳 / 错误抖动 / 已完成态
+   ========================================================================== */
+
+/* 正确：整体（形状 + 数字）缩一下回弹 */
+.cell.is-correct {
+  animation: pop .26s var(--ease-out-back);
+}
+
+@keyframes pop {
+  0%   { transform: scale(1); }
+  38%  { transform: scale(.9); }
+  100% { transform: scale(1); }
+}
+
+/* 已找到的格子：数字保留但整体安静下来 */
+.cell.is-found .cell-shape {
+  fill: var(--tiffany-soft);
+}
+
+.skin-cobble.cell.is-found .cell-shape {
+  fill: var(--tiffany-soft) !important;
+}
+
+.cell.is-found text {
+  fill: var(--tiffany-dark) !important;
+}
+
+/* 错误：左右抖动 300ms 并泛红 */
+.cell.is-wrong {
+  animation: shake .3s ease;
+}
+
+.cell.is-wrong .cell-shape,
+.cell-classic.is-wrong {
+  fill: var(--wrong-soft);
+  stroke: var(--wrong);
+}
+
+.cell-classic.is-wrong {
+  color: var(--wrong);
+  background: var(--wrong-soft);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-7px); }
+  40%      { transform: translateX(6px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(3px); }
+}
+
+/* SVG 单元格的缩放/抖动作用于内部包裹组 */
+.svg-cell {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* ==========================================================================
+   8. 底部操作按钮
+   ========================================================================== */
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn {
+  min-height: 46px;
+  padding: 0 22px;
+  border-radius: var(--radius-btn);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  transition: transform .16s var(--ease-out-back), background .18s ease,
+              box-shadow .18s ease, border-color .18s ease;
+  touch-action: manipulation;
+}
+
+.btn:active {
+  transform: scale(.97);
+}
+
+.btn--primary {
+  flex: 1.4;
+  background: var(--tiffany);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(10, 186, 181, .28);
+}
+
+.btn--primary:hover {
+  background: var(--tiffany-dark);
+}
+
+.btn--ghost {
+  flex: 1;
+  background: var(--bg-card);
+  color: var(--tiffany-dark);
+  border: 1.5px solid var(--tiffany);
+}
+
+.btn--ghost:hover {
+  background: var(--tiffany-soft);
+}
+
+.btn--block {
+  flex: 1;
+}
+
+/* ==========================================================================
+   9. 弹框通用：遮罩淡入 + 内容上移归位
+   ========================================================================== */
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(31, 45, 45, .42);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: fadeIn .2s ease;
+}
+
+/* hidden 属性优先于 display:flex，保证弹框默认隐藏 */
+.modal-mask[hidden] {
+  display: none;
+}
+
+.modal {
+  width: min(100%, 460px);
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  background: var(--bg-card);
+  border-radius: var(--radius-modal);
+  box-shadow: var(--shadow-modal);
+  padding: 26px 24px 22px;
+  animation: rise .28s var(--ease-out-back);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.modal__title {
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.modal__footer {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* ==========================================================================
+   10. 模式选择弹框：选项组 + 自定义圆形 radio
+   ========================================================================== */
+.opt-group {
+  border: none;
+  margin-bottom: 22px;
+}
+
+.opt-group__label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-sub);
+  margin-bottom: 12px;
+  display: block;
+}
+
+.opt-group__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+}
+
+/* 单个选项：隐藏原生 input，用 .radio-dot 自绘 */
+.opt-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-main);
+  cursor: pointer;
+  min-height: 40px;
+  padding: 4px 6px;
+  border-radius: 10px;
+  transition: color .18s ease;
+}
+
+.opt-item input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.radio-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #C9D6D5;
+  background: #fff;
+  position: relative;
+  flex: none;
+  transition: border-color .18s ease, background .18s ease;
+}
+
+/* 选中态：蒂芙尼蓝实心 + 白心，打点缩放回弹 */
+.radio-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #fff;
+  transform: scale(0);
+  transition: transform .22s var(--ease-out-back);
+}
+
+.opt-item input:checked + .radio-dot {
+  border-color: var(--tiffany);
+  background: var(--tiffany);
+}
+
+.opt-item input:checked + .radio-dot::after {
+  transform: scale(1);
+}
+
+.opt-item:has(input:checked) {
+  color: var(--tiffany-dark);
+}
+
+/* 键盘聚焦可见性 */
+.opt-item input:focus-visible + .radio-dot {
+  box-shadow: 0 0 0 4px var(--tiffany-soft);
+}
+
+/* 禁用态（小屏 7×7/8×8/9×9） */
+.opt-item.is-disabled {
+  color: var(--text-disabled);
+  cursor: not-allowed;
+}
+
+.opt-item.is-disabled .radio-dot {
+  border-color: #E3EAE9;
+  background: #F4F7F7;
+}
+
+.opt-group__tip {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--wrong);
+}
+
+/* ==========================================================================
+   11. 结果展示弹框
+   ========================================================================== */
+.modal--result {
+  width: min(100%, 380px);
+  text-align: center;
+  padding-top: 32px;
+}
+
+.result-clap {
+  font-size: 64px;
+  line-height: 1;
+  animation: clap .5s var(--ease-out-back);
+}
+
+@keyframes clap {
+  0%   { transform: scale(.4) rotate(-12deg); opacity: 0; }
+  60%  { transform: scale(1.12) rotate(4deg); }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+.result-time {
+  margin-top: 14px;
+  font-size: 18px;
+  color: var(--text-sub);
+}
+
+.result-time strong {
+  font-family: var(--font-num);
+  font-size: 34px;
+  color: var(--tiffany-dark);
+  margin: 0 4px;
+}
+
+/* 两列数据网格，最高连对占满整行 */
+.result-grid {
+  margin: 22px 0 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.result-grid__item {
+  background: var(--bg-page);
+  border-radius: 14px;
+  padding: 12px 8px;
+}
+
+.result-grid__item--full {
+  grid-column: 1 / -1;
+}
+
+.result-grid__item dt {
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+.result-grid__item dd {
+  margin-top: 4px;
+  font-family: var(--font-num);
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.result-grid__item dd.is-ok  { color: #2E7D5B; }
+.result-grid__item dd.is-err { color: var(--wrong); }
+
+.result-tip {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--text-disabled);
+}
+
+/* ==========================================================================
+   12. 响应式适配：移动端 H5（窄屏两排统计卡、收紧留白）
+   ========================================================================== */
+@media (max-width: 480px) {
+  .app {
+    padding: 14px 12px 20px;
+    gap: 12px;
+  }
+
+  .app-title { font-size: 22px; letter-spacing: 1px; }
+  .app-subtitle { font-size: 12px; }
+
+  /* 五张统计卡：3 + 2 两行紧凑排布 */
+  .stats-bar {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .stat-card { padding: 8px 4px; }
+  .stat-card__value { font-size: 19px; }
+
+  .board-frame {
+    width: min(96vw, calc(100dvh - 300px));
+    padding: 6px;
+    border-radius: 16px;
+  }
+
+  .btn { min-height: 48px; font-size: 15px; padding: 0 14px; }
+
+  .modal { padding: 22px 18px 18px; border-radius: 18px; }
+  .opt-item { font-size: 16px; min-height: 44px; }
+}
+
+/* 矮屏横屏手机：压缩头部，保证画板可见 */
+@media (max-height: 520px) {
+  .app-header { display: none; }
+  .stats-bar { grid-template-columns: repeat(5, 1fr); }
+}
+
+/* 尊重系统“减少动态效果”偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
