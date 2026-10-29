@@ -7,7 +7,7 @@
  *   - 白底 + 墨绿青描边，共 n 行 × n 列 = n² 个格子。
  * ========================================================================== */
 import { shuffle, range } from "./config";
-import { svgUtil } from "./boards";
+import { svgUtil } from "./svg-util";
 
   var PAD = 34; // 适配 1000×1000 viewBox 时保留的内边距
 
