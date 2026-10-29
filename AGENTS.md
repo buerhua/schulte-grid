@@ -12,17 +12,17 @@ index.html              # 页面骨架：标题栏/统计条/画板/操作按钮
 css/style.css           # 全部样式（12 个功能分组，见文件头注释）
 js/
   config.js             # 可选项、色盘、小屏判定（物理像素<600）、工具函数
-  audio.js              # 叮/咚音效对象池（assets/sounds/*.wav）
-  voronoi.js            # Voronoi 多边形（半平面裁切 + Lloyd 松弛）
-  boards.js             # 渲染器注册表 + SVG 共享工具（App.SvgUtil）
-  board-classic.js      # 经典方格：CSS Grid + <button>
+  audio.js              # 音效池：叮 / 咚（assets/sounds/*.wav）
+  voronoi.js            # 几何工具：半平面裁切生成 Voronoi 多边形
+  boards.js             # 五种方格形态渲染器注册表 + SVG 共享工具（SvgUtil）
+  board-classic.js      # 经典方格：CSS Grid + <button> classic / irregular / cobble / honey / ring 渲染器
   board-irregular.js    # 不规则：Voronoi polygon
   board-cobble.js       # 鹅卵石：Voronoi 收缩 + 中点贝塞尔平滑，马卡龙填充
   board-honey.js        # 蜂巢：pointy-top 六边形错位排列
   board-ring.js         # 圆环：同心环扇区（最大余数法分配格数）
   game.js               # 核心状态机：计时/判定/连击/完成事件
   ui.js                 # 统计条、模式选择弹框、结果弹框
-  main.js               # 入口：装配事件、首屏弹框、resize 防抖
+  main.js               # 启动入口：初始化、响应式监听，装配事件、首屏弹框、resize 防抖
 assets/
   favicon.svg           # 主题图标
   sounds/ding.wav       # 正确音效（G6+C7+E7 钟音）
@@ -30,9 +30,9 @@ assets/
 ```
 
 ## 核心架构约定
-- 所有脚本挂载到全局命名空间 `window.App`，**禁止改为 ES Module**（需支持 file:// 双击直开）。
-- 渲染器契约：`render(container, count, ctx)`，每个可点击根元素必须有 `class="cell"` 与 `data-num`；新增方格形态时实现渲染函数并 `App.boards.register(type, fn)`，同时在 `config.js` 的 `TYPE_OPTIONS` 登记。
-- 游戏事件用订阅：`App.game.on('stats'|'firstClick'|'finish', fn)`；UI 与规则解耦。
+- 所有脚本 使用 ES Module 加载。
+- 渲染器契约：`render(container, count, ctx)`，每个可点击根元素必须有 `class="cell"` 与 `data-num`；新增方格形态时实现渲染函数并 `boards.register(type, fn)`，同时在 `config.js` 的 `TYPE_OPTIONS` 登记。
+- 游戏事件用订阅：`game.on('stats'|'firstClick'|'finish', fn)`；UI 与规则解耦。
 - 数字色按格子位置取 `ctx.colors[i]`（色盘循环后整体洗牌），不要在渲染器内部自行随机。
 - SVG 统一 viewBox `0 0 1000 1000`，坐标自适应；经典方格字号用容器查询单位 `cqi`。
 
@@ -43,8 +43,9 @@ assets/
 - 结果弹框任何方式关闭（按钮/遮罩/Esc）都按当前模式自动重开。
 
 ## 常用命令
-- 启动：`python3 -m http.server ${DEPLOY_RUN_PORT}`（或 coze dev 自动托管）
-- JS 语法检查：`for f in js/*.js; do node --check "$f"; done`
+- pnpm dev          # 启动开发服务器
+- pnpm build        # 构建生产版本 (vite build)
+- pnpm preview      # 预览生产构建
 - 无单元测试框架；几何与渲染逻辑可用 Node 桩环境 + Playwright（沙箱已装 chromium）做验证脚本。
 
 ## 代码风格

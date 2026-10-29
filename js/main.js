@@ -8,25 +8,27 @@
  *   3. 首屏自动弹出模式选择（取消则使用默认 4×4 + 经典方格）；
  *   4. 监听视口变化（防抖），小屏状态变化时即时刷新弹框中的禁用选项。
  * ========================================================================== */
-(function (global) {
-  'use strict';
-
-  var App = global.App;
+import { DEFAULT_CONFIG, SMALL_SCREEN_MAX_SIZE, isSmallScreen } from './config';
+import { audio } from './audio';
+import { boards } from './boards';
+import { game } from './game';
+import { ui } from './ui';
 
   function boot() {
     var boardEl = document.getElementById('board');
 
     // 当前生效配置：默认 4×4 + 经典方格（取消模式弹框时沿用）
     var currentConfig = {
-      size: App.DEFAULT_CONFIG.size,
-      type: App.DEFAULT_CONFIG.type
+      size: DEFAULT_CONFIG.size,
+      type: DEFAULT_CONFIG.type,
     };
 
     /* ---------- 初始化各子系统 ---------- */
-    App.audio.init();
-    App.game.init(boardEl);
+    audio.init();
+    boards.init();
+    game.init(boardEl);
 
-    App.ui.init({
+    ui.init({
       // 模式弹框“确定”：应用新配置立即开一局
       confirm: function (config) {
         startGame(config);
@@ -46,17 +48,17 @@
     });
 
     /* ---------- 订阅游戏事件 ---------- */
-    App.game.on('stats', function (snap) {
-      App.ui.renderStats(snap);
+    game.on('stats', function (snap) {
+      ui.renderStats(snap);
     });
 
-    App.game.on('firstClick', function () {
-      App.ui.setHintHidden(true);
+    game.on('firstClick', function () {
+      ui.setHintHidden(true);
     });
 
-    App.game.on('finish', function (result) {
-      App.ui.setHintHidden(true);
-      App.ui.showResult(result);
+    game.on('finish', function (result) {
+      ui.setHintHidden(true);
+      ui.showResult(result);
     });
 
     /**
@@ -65,38 +67,40 @@
      */
     function startGame(config) {
       var size = config.size;
-      if (App.isSmallScreen() && size > App.SMALL_SCREEN_MAX_SIZE) {
-        size = App.SMALL_SCREEN_MAX_SIZE;
+      if (isSmallScreen() && size > SMALL_SCREEN_MAX_SIZE) {
+        size = SMALL_SCREEN_MAX_SIZE;
       }
       currentConfig = { size: size, type: config.type };
-      App.ui.setHintHidden(false);
-      App.game.newGame(currentConfig);
+      ui.setHintHidden(false);
+      game.newGame(currentConfig);
     }
 
     /* ---------- 首屏：先用默认配置起局，再自动弹出模式选择 ---------- */
     startGame(currentConfig);
-    App.ui.openMode(currentConfig);
+    ui.openMode(currentConfig);
 
     /* ---------- 视口变化：小屏判定改变时刷新弹框选项（300ms 防抖）---------- */
     var resizeTimer = 0;
-    var wasSmall = App.isSmallScreen();
-    global.addEventListener('resize', function () {
+    var wasSmall = isSmallScreen();
+    window.addEventListener('resize', function () {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(function () {
-        var small = App.isSmallScreen();
+        var small = isSmallScreen();
         if (small !== wasSmall) {
           wasSmall = small;
           // 若模式弹框正打开着，立即重绘禁用态
           var modeModal = document.getElementById('modeModal');
           if (modeModal && !modeModal.hidden) {
-            App.ui.openMode(currentConfig);
+            ui.openMode(currentConfig);
           }
         }
       }, 300);
     });
-    global.addEventListener('orientationchange', function () {
+    window.addEventListener('orientationchange', function () {
       // 横竖屏切换后延迟更久一点，等浏览器视口数据稳定
-      setTimeout(function () { global.dispatchEvent(new Event('resize')); }, 200);
+      setTimeout(function () {
+        window.dispatchEvent(new Event('resize'));
+      }, 200);
     });
   }
 
@@ -106,4 +110,3 @@
   } else {
     boot();
   }
-})(window);

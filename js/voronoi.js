@@ -13,15 +13,12 @@
  * 输出坐标统一在 0 ~ VIEW 单位的虚拟画布中，渲染端再映射到 SVG viewBox。
  *
  * 对外接口：
- *   App.voronoi.generate(count, relaxTimes) -> [{ points, cx, cy, r }]
+ *   voronoi.generate(count, relaxTimes) -> [{ points, cx, cy, r }]
  * ========================================================================== */
-(function (global) {
-  'use strict';
+import { rand } from './config';
 
-  var App = global.App;
-
-  var VIEW = 1000;          // 虚拟画布边长
-  var MARGIN = 34;          // 种子点安全边距，保证边缘格子不至于太碎
+  var VIEW = 1000; // 虚拟画布边长
+  var MARGIN = 34; // 种子点安全边距，保证边缘格子不至于太碎
 
   /**
    * 生成一组铺满正方形的 Voronoi 单元格。
@@ -37,8 +34,8 @@
     var seeds = [];
     for (var i = 0; i < count; i++) {
       seeds.push({
-        x: App.rand(MARGIN, VIEW - MARGIN),
-        y: App.rand(MARGIN, VIEW - MARGIN)
+        x: rand(MARGIN, VIEW - MARGIN),
+        y: rand(MARGIN, VIEW - MARGIN),
       });
     }
 
@@ -174,8 +171,7 @@
     return { x: cx / (6 * area), y: cy / (6 * area) };
   }
 
-  App.voronoi = {
+  export const voronoi = {
     VIEW: VIEW,
     generate: generate
   };
-})(window);

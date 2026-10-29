@@ -2,8 +2,8 @@
  * boards.js —— 方格渲染器注册表与共享工具
  *
  * 五种方格形态（classic / irregular / cobble / honey / ring）各自有一个
- * 渲染器文件，并通过 App.boards.register 注册到这里。游戏核心逻辑只调用
- * 统一入口 App.boards.render(container, config)，不关心具体形态。
+ * 渲染器文件，并通过 boards.register 注册到这里。游戏核心逻辑只调用
+ * 统一入口 boards.render(container, config)，不关心具体形态。
  *
  * 渲染契约（每个形态渲染器都遵守）：
  *   render(container, count, ctx)
@@ -15,13 +15,16 @@
  *   colors: 每个格子的数字颜色（长度 = count，已随数字位置打乱）
  *   fillColors: 鹅卵石等需要底色时使用的填充色数组
  * ========================================================================== */
-(function (global) {
-  'use strict';
+import { NUMBER_COLORS, clamp } from './config';
+import { renderClassic } from './board-classic';
+import { renderCobble } from './board-cobble';
+import { renderHoney } from './board-honey';
+import { renderIrregular } from './board-irregular';
+import { renderRing } from './board-ring';
 
-  var App = global.App;
   var SVG_NS = 'http://www.w3.org/2000/svg';
 
-  var Boards = {
+  export const boards = {
     _renderers: {},
 
     /**
@@ -29,8 +32,19 @@
      * @param {string} type 形态 key（与 TYPE_OPTIONS 的 value 对应）
      * @param {function(HTMLElement, number, Object)} renderer 渲染函数
      */
-    register: function (type, renderer) {
+    _register: function (type, renderer) {
       this._renderers[type] = renderer;
+    },
+
+    /**
+     * 初始化渲染器注册
+     */
+    init() {
+      this._register('classic', renderClassic);
+      this._register('cobble', renderCobble);
+      this._register('honey', renderHoney);
+      this._register('irregular', renderIrregular);
+      this._register('ring', renderRing);
     },
 
     /**
@@ -54,7 +68,7 @@
    * SVG 共享工具：供不规则 / 鹅卵石 / 蜂巢 / 圆环四种形态复用
    * ------------------------------------------------------------------ */
 
-  var SvgUtil = {
+  export const svgUtil = {
     NS: SVG_NS,
     VIEW: 1000,
 
@@ -84,7 +98,7 @@
         'x': x.toFixed(2),
         'y': y.toFixed(2),
         'font-size': fontSize.toFixed(1),
-        'fill': fillColor || App.NUMBER_COLORS[(num - 1) % App.NUMBER_COLORS.length]
+        'fill': fillColor || NUMBER_COLORS[(num - 1) % NUMBER_COLORS.length],
       });
       text.textContent = String(num);
       g._cellText = text;   // 暂存，等形状构造完再统一 append
@@ -114,7 +128,7 @@
      * @returns {number}
      */
     fontSizeFor: function (ref) {
-      return App.clamp(ref * 0.42, 30, 150);
+      return clamp(ref * 0.42, 30, 150);
     },
 
     /**
@@ -155,7 +169,3 @@
       return bbox;
     }
   };
-
-  App.boards = Boards;
-  App.SvgUtil = SvgUtil;
-})(window);

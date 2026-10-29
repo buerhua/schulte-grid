@@ -141,28 +141,6 @@
       </div>
     </div>
 
-    <!-- ================================================== -->
-    <!-- 脚本区（经典脚本顺序加载，无构建步骤，支持 file:// 直开）-->
-    <!-- 1. config   全局配置：选项、色盘、设备判定阈值          -->
-    <!-- 2. audio    音效池：叮 / 咚（assets/sounds/*.wav）     -->
-    <!-- 3. voronoi  几何工具：半平面裁切生成 Voronoi 多边形    -->
-    <!-- 4. boards   五种方格形态渲染器注册表                   -->
-    <!-- 5. classic / irregular / cobble / honey / ring 渲染器  -->
-    <!-- 6. game     游戏核心：状态机、计时、判定、连击          -->
-    <!-- 7. ui       模式选择弹框、结果弹框、统计条渲染          -->
-    <!-- 8. main     启动入口：初始化、响应式监听                -->
-    <!-- ================================================== -->
-    <script src="js/config.js"></script>
-    <script src="js/audio.js"></script>
-    <script src="js/voronoi.js"></script>
-    <script src="js/boards.js"></script>
-    <script src="js/board-classic.js"></script>
-    <script src="js/board-irregular.js"></script>
-    <script src="js/board-cobble.js"></script>
-    <script src="js/board-honey.js"></script>
-    <script src="js/board-ring.js"></script>
-    <script src="js/game.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/main.js"></script>
+    <script type="module" src="js/main.js"></script>
   </body>
 </html>

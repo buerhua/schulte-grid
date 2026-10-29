@@ -18,12 +18,11 @@
  *
  * 与界面层完全解耦：通过 on(event, fn) 订阅 'stats' / 'firstClick' / 'finish'。
  * ========================================================================== */
-(function (global) {
-  'use strict';
+import { NUMBER_COLORS, PEBBLE_COLORS, shuffle } from './config';
+import { audio } from './audio';
+import { boards } from './boards';
 
-  var App = global.App;
-
-  var Game = {
+  export const game = {
     // 当前游戏配置与状态（newGame 时整体重置）
     config: null,
     state: null,
@@ -93,11 +92,11 @@
       // 颜色上下文：色盘循环取够 count 个后打乱位置顺序，
       // 由各渲染器在摆放数字时按“格子位置”取用。
       var ctx = {
-        colors: App.shuffle(cyclePalette(App.NUMBER_COLORS, count)),
-        fillColors: App.shuffle(cyclePalette(App.PEBBLE_COLORS, count))
+        colors: shuffle(cyclePalette(NUMBER_COLORS, count)),
+        fillColors: shuffle(cyclePalette(PEBBLE_COLORS, count)),
       };
 
-      App.boards.render(this.boardEl, this.config, ctx);
+      boards.render(this.boardEl, this.config, ctx);
       this._emitStats();
     },
 
@@ -131,7 +130,7 @@
      */
     _onCorrect: function (num, cell) {
       var st = this.state;
-      App.audio.play('ding');
+      audio.play('ding');
 
       st.correct++;
       st.streak++;
@@ -158,7 +157,7 @@
      */
     _onWrong: function (cell) {
       var st = this.state;
-      App.audio.play('dong');
+      audio.play('dong');
 
       st.wrong++;
       st.streak = 0;
@@ -254,6 +253,3 @@
     }
     return out;
   }
-
-  App.game = Game;
-})(window);

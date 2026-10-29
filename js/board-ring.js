@@ -8,11 +8,8 @@
  *   - 相邻环的分割线错开一个相位角，避免径向缝对齐；
  *   - 白底 + 墨绿青描边，中心留空。
  * ========================================================================== */
-(function (global) {
-  'use strict';
-
-  var App = global.App;
-  var U = App.SvgUtil;
+import { shuffle, range } from './config';
+import { svgUtil} from './boards'
 
   var CENTER = 500;   // viewBox 中心
   var R_OUT = 472;    // 最外环外半径
@@ -24,8 +21,8 @@
    * @param {number} count 格子总数（n²）
    * @param {{colors:string[]}} ctx 共享颜色上下文
    */
-  function renderRing(container, count, ctx) {
-    var svg = U.createSvg(container, 'skin-ring');
+  export function renderRing(container, count, ctx) {
+    var svg = svgUtil.createSvg(container, 'skin-ring');
 
     // 1) 决定环数：阶数越高环数越多
     //    4×4→2 环（内 6 外 10，与参考稿一致），5~6→2~3 环，7×7→3 环，8~9→3 环
@@ -50,7 +47,7 @@
     var sectors = allocateInteger(count, weights);
 
     // 4) 逐环逐扇区生成格子
-    var order = App.shuffle(App.range(count));
+    var order = shuffle(range(count));
     var frag = document.createDocumentFragment();
     var idx = 0;
 
@@ -70,8 +67,8 @@
         var a1 = a0 + step;
 
         var d = annularSectorPath(CENTER, CENTER, r0, r1, a0, a1);
-        var g = U.el('g', { 'class': 'cell svg-cell', 'data-num': num });
-        var shape = U.el('path', { 'class': 'cell-shape', 'd': d });
+        var g = svgUtil.el('g', { 'class': 'cell svg-cell', 'data-num': num });
+        var shape = svgUtil.el('path', { 'class': 'cell-shape', 'd': d });
 
         // 数字落在扇区角平分线上的环中线位置
         var aMid = (a0 + a1) / 2;
@@ -80,9 +77,9 @@
 
         // 字号取“径向厚度”与“中线弧长”两者较小值的 42%
         var arcLen = rMid * step;
-        var fontSize = U.fontSizeFor(Math.min(thickness, arcLen));
+        var fontSize = svgUtil.fontSizeFor(Math.min(thickness, arcLen));
 
-        var text = U.el('text', {
+        var text = svgUtil.el('text', {
           'class': 'cell-text',
           'x': tx.toFixed(1),
           'y': ty.toFixed(1),
@@ -157,6 +154,3 @@
       'Z'
     ].join('');
   }
-
-  App.boards.register('ring', renderRing);
-})(window);

@@ -6,10 +6,7 @@
  *   - 每个格子是一个 <button>，数字用多色盘随机着色；
  *   - 字号通过容器查询单位 cqi 随格子尺寸自适应（见 CSS）。
  * ========================================================================== */
-(function (global) {
-  'use strict';
-
-  var App = global.App;
+import { shuffle, range } from './config';
 
   /**
    * 渲染经典方格。
@@ -17,7 +14,7 @@
    * @param {number} count 格子总数（n²）
    * @param {{colors:string[]}} ctx 共享颜色上下文（按格子位置对应）
    */
-  function renderClassic(container, count, ctx) {
+  export function renderClassic(container, count, ctx) {
     var n = Math.round(Math.sqrt(count));
 
     // 容器切换为经典网格皮肤，并把阶数写入 CSS 变量 --n
@@ -28,7 +25,7 @@
     var frag = document.createDocumentFragment();
 
     // 数字 1..count 随机分布到各个格子
-    var order = App.shuffle(App.range(count));
+    var order = shuffle(range(count));
     var pos = 0;
 
     for (var row = 0; row < n; row++) {
@@ -48,6 +45,3 @@
 
     container.appendChild(frag);
   }
-
-  App.boards.register('classic', renderClassic);
-})(window);

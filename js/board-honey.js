@@ -6,11 +6,8 @@
  *   - 奇数行整体向右错开半个身位，形成蜂窝咬合；
  *   - 白底 + 墨绿青描边，共 n 行 × n 列 = n² 个格子。
  * ========================================================================== */
-(function (global) {
-  'use strict';
-
-  var App = global.App;
-  var U = App.SvgUtil;
+import { shuffle, range } from "./config";
+import { svgUtil } from "./boards";
 
   var PAD = 34; // 适配 1000×1000 viewBox 时保留的内边距
 
@@ -20,8 +17,8 @@
    * @param {number} count 格子总数
    * @param {{colors:string[]}} ctx 共享颜色上下文
    */
-  function renderHoney(container, count, ctx) {
-    var svg = U.createSvg(container, 'skin-honey');
+  export function renderHoney(container, count, ctx) {
+    var svg = svgUtil.createSvg(container, 'skin-honey');
     var n = Math.round(Math.sqrt(count));
 
     // ---- 第一步：在自然坐标（边长 s=1）中生成全部六边形中心点 ----
@@ -45,12 +42,12 @@
     centers.forEach(function (ct) {
       hexVertices(ct.x, ct.y, s).forEach(function (p) { allPts.push(p); });
     });
-    var bbox = U.bboxOf(allPts);
+    var bbox = svgUtil.bboxOf(allPts);
     var w = bbox.maxX - bbox.minX;
     var h = bbox.maxY - bbox.minY;
-    var scale = Math.min((U.VIEW - PAD * 2) / w, (U.VIEW - PAD * 2) / h);
-    var ox = (U.VIEW - w * scale) / 2 - bbox.minX * scale;
-    var oy = (U.VIEW - h * scale) / 2 - bbox.minY * scale;
+    var scale = Math.min((svgUtil.VIEW - PAD * 2) / w, (svgUtil.VIEW - PAD * 2) / h);
+    var ox = (svgUtil.VIEW - w * scale) / 2 - bbox.minX * scale;
+    var oy = (svgUtil.VIEW - h * scale) / 2 - bbox.minY * scale;
 
     // 坐标变换：自然坐标 → viewBox 坐标
     var tx = function (p) {
@@ -58,7 +55,7 @@
     };
 
     // ---- 第三步：生成乱序数字并绘制 ----
-    var order = App.shuffle(App.range(count));
+    var order = shuffle(range(count));
     var frag = document.createDocumentFragment();
 
     centers.forEach(function (ct, i) {
@@ -66,16 +63,16 @@
       var verts = hexVertices(ct.x, ct.y, s).map(tx);
       var ctv = tx(ct);
 
-      var g = U.el('g', { 'class': 'cell svg-cell', 'data-num': num });
+      var g = svgUtil.el('g', { 'class': 'cell svg-cell', 'data-num': num });
 
-      var shape = U.el('polygon', {
+      var shape = svgUtil.el('polygon', {
         'class': 'cell-shape',
         'points': verts.map(function (p) {
           return p.x.toFixed(1) + ',' + p.y.toFixed(1);
         }).join(' ')
       });
 
-      var text = U.el('text', {
+      var text = svgUtil.el('text', {
         'class': 'cell-text',
         'x': ctv.x.toFixed(1),
         'y': ctv.y.toFixed(1),
@@ -112,6 +109,3 @@
     }
     return verts;
   }
-
-  App.boards.register('honey', renderHoney);
-})(window);

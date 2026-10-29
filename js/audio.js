@@ -7,17 +7,12 @@
  *   3. 首次用户点击前浏览器可能阻止音频，play() 失败时静默降级（不影响游戏）
  *
  * 对外接口：
- *   App.audio.play('ding' | 'dong')
+ *   audio.play('ding' | 'dong')
  * ========================================================================== */
-(function (global) {
-  'use strict';
-
-  var App = global.App;
-
   // 每种音效保留的 Audio 实例数量（池大小）
   var POOL_SIZE = 5;
 
-  var AudioManager = {
+  export const audio = {
     _pools: { ding: [], dong: [] },
     _cursor: { ding: 0, dong: 0 },
 
@@ -41,11 +36,11 @@
             }).catch(function () { /* 忽略解锁失败 */ });
           }, this);
         }, this);
-        global.removeEventListener('touchstart', unlock);
-        global.removeEventListener('pointerdown', unlock);
+        window.removeEventListener('touchstart', unlock);
+        window.removeEventListener('pointerdown', unlock);
       }.bind(this);
-      global.addEventListener('touchstart', unlock, { once: true, passive: true });
-      global.addEventListener('pointerdown', unlock, { once: true, passive: true });
+      window.addEventListener('touchstart', unlock, { once: true, passive: true });
+      window.addEventListener('pointerdown', unlock, { once: true, passive: true });
     },
 
     /**
@@ -82,6 +77,3 @@
       }
     }
   };
-
-  App.audio = AudioManager;
-})(window);

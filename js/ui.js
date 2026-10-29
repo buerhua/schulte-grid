@@ -7,12 +7,9 @@
  *   - showResult(result)：游戏完成后展示成绩，关闭时通过 handlers.resultClosed
  *     通知入口层自动重开一局。
  * ========================================================================== */
-(function (global) {
-  'use strict';
+import { SMALL_SCREEN_MAX_SIZE, SIZE_OPTIONS, TYPE_OPTIONS, isSmallScreen } from './config';
 
-  var App = global.App;
-
-  var UI = {
+  export const ui = {
     // DOM 缓存
     els: {},
     // 外部注入的事件回调
@@ -130,10 +127,10 @@
     openMode: function (config) {
       this._draft = { size: config.size, type: config.type };
 
-      var small = App.isSmallScreen();
+      var small = isSmallScreen();
       // 小屏设备：当前若处于 7×7 以上，选择项自动回落到 6×6
-      if (small && this._draft.size > App.SMALL_SCREEN_MAX_SIZE) {
-        this._draft.size = App.SMALL_SCREEN_MAX_SIZE;
+      if (small && this._draft.size > SMALL_SCREEN_MAX_SIZE) {
+        this._draft.size = SMALL_SCREEN_MAX_SIZE;
       }
 
       this._renderSizeOptions(small);
@@ -154,8 +151,8 @@
      */
     _renderSizeOptions: function (small) {
       this.els.sizeOptions.innerHTML = '';
-      App.SIZE_OPTIONS.forEach(function (opt) {
-        var disabled = small && opt.value > App.SMALL_SCREEN_MAX_SIZE;
+      SIZE_OPTIONS.forEach(function (opt) {
+        var disabled = small && opt.value > SMALL_SCREEN_MAX_SIZE;
         var label = this._makeRadio({
           name: 'opt-size',
           value: String(opt.value),
@@ -171,7 +168,7 @@
     /** 渲染“方格类型”单选项 @private */
     _renderTypeOptions: function () {
       this.els.typeOptions.innerHTML = '';
-      App.TYPE_OPTIONS.forEach(function (opt) {
+      TYPE_OPTIONS.forEach(function (opt) {
         var label = this._makeRadio({
           name: 'opt-type',
           value: opt.value,
@@ -248,6 +245,3 @@
       this.handlers.resultClosed && this.handlers.resultClosed();
     }
   };
-
-  App.ui = UI;
-})(window);

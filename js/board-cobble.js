@@ -6,11 +6,9 @@
  *   - 再用“中点二次贝塞尔”把尖角全部磨圆，变成鹅卵石般的圆润色块；
  *   - 填充马卡龙色盘（蜜桃/薰衣草/薄荷/奶油/樱粉/雾蓝），无描边。
  * ========================================================================== */
-(function (global) {
-  'use strict';
-
-  var App = global.App;
-  var U = App.SvgUtil;
+import { shuffle, range } from './config';
+import { svgUtil } from './boards';
+import { voronoi } from './voronoi';
 
   var SHRINK = 0.905; // 收缩系数：越小缝隙越大
 
@@ -20,12 +18,12 @@
    * @param {number} count 格子总数
    * @param {{colors:string[], fillColors:string[]}} ctx 数字色与底色上下文
    */
-  function renderCobble(container, count, ctx) {
-    var svg = U.createSvg(container, 'skin-cobble');
+  export function renderCobble(container, count, ctx) {
+    var svg = svgUtil.createSvg(container, 'skin-cobble');
 
     // 鹅卵石希望形状更随性一些，松弛 2 次保留自然差异
-    var cells = App.voronoi.generate(count, 2);
-    var order = App.shuffle(App.range(count));
+    var cells = voronoi.generate(count, 2);
+    var order = shuffle(range(count));
     var frag = document.createDocumentFragment();
 
     cells.forEach(function (cell, i) {
@@ -42,19 +40,19 @@
       // 2) 中点二次贝塞尔平滑：以各顶点为控制点，相邻中点为起止点
       var d = smoothClosedPath(shrunk);
 
-      var g = U.el('g', { 'class': 'cell svg-cell', 'data-num': num });
+      var g = svgUtil.el('g', { class: 'cell svg-cell', 'data-num': num });
 
-      var shape = U.el('path', {
+      var shape = svgUtil.el('path', {
         'class': 'cell-shape',
         'd': d,
         'fill': ctx.fillColors[i]
       });
 
-      var text = U.el('text', {
+      var text = svgUtil.el('text', {
         'class': 'cell-text',
         'x': cell.cx.toFixed(1),
         'y': cell.cy.toFixed(1),
-        'font-size': U.fontSizeFor(cell.r * 2 * SHRINK).toFixed(1),
+        'font-size': svgUtil.fontSizeFor(cell.r * 2 * SHRINK).toFixed(1),
         'fill': ctx.colors[i]
       });
       text.textContent = String(num);
@@ -93,6 +91,3 @@
     }
     return d + 'Z';
   }
-
-  App.boards.register('cobble', renderCobble);
-})(window);
