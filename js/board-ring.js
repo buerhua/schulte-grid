@@ -9,7 +9,7 @@
  *   - 白底 + 墨绿青描边，中心留空。
  * ========================================================================== */
 import { shuffle, range } from './config';
-import { svgUtil} from './boards'
+import { svgUtil } from './svg-util';
 
   var CENTER = 500;   // viewBox 中心
   var R_OUT = 472;    // 最外环外半径

@@ -62,7 +62,8 @@ html {
 }
 
 body {
-  min-height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh; /* 渐进增强：支持 dvh 的浏览器使用动态视口 */
   font-family: var(--font-cn);
   color: var(--text-main);
   /* 极淡的纸面渐变，避免大面积纯色的呆板 */
@@ -91,7 +92,8 @@ button {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  min-height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh; /* 渐进增强 */
 }
 
 .app-header {
@@ -206,7 +208,8 @@ button {
 .board-frame {
   position: relative;
   /* 宽 = 视口宽 92%、高度留白后、最大 620px 三者取最小，保证正方形完整可见 */
-  width: min(92vw, calc(100dvh - 268px), 620px);
+  width: min(92vw, calc(100vh - 268px), 620px);
+  width: min(92vw, calc(100dvh - 268px), 620px); /* 渐进增强：支持 dvh 的浏览器使用动态视口 */
   aspect-ratio: 1 / 1;
   background: var(--bg-card);
   border-radius: 20px;
@@ -249,51 +252,20 @@ button {
 }
 
 /* ==========================================================================
-   5. 经典方格：严格网格，白底细分隔线
+   5. 经典方格：SVG 严格网格，白底细分隔线
    ========================================================================== */
-.board--classic {
-  display: grid;
-  /* 行列数由 JS 写入 CSS 变量 --n */
-  grid-template-columns: repeat(var(--n, 4), 1fr);
-  grid-template-rows: repeat(var(--n, 4), 1fr);
-  gap: 1px;
-  background: #B9DCD9;                 /* 缝隙色：淡蒂芙尼青 */
-  border: 1.5px solid var(--tiffany);
-  border-radius: 8px;
-  overflow: hidden;
+/* 经典方格现在使用 SVG 渲染，与其他形态共享 .svg-cell 样式 */
+/* 外框由 JS 绘制，这里只需确保 SVG 容器正确显示 */
+.board--classic svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
-.cell-classic {
-  position: relative;
-  background: var(--bg-card);
-  border: none;
-  /* 字号 = 单格宽度的 42%（容器查询单位 cqw） */
-  font-size: calc(42cqi / var(--n, 4));
-  font-family: var(--font-num);
-  font-weight: 700;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  transition: background .18s ease, color .18s ease, transform .16s var(--ease-out-back);
-  user-select: none;
+/* 经典方格特有：外框描边已在 SVG 中绘制 */
+.classic-border {
+  pointer-events: none;
 }
-
-/* 经典方格容器作为字号查询容器 */
-.board--classic {
-  container-type: inline-size;
-}
-
-.cell-classic:active {
-  background: var(--tiffany-soft);
-}
-
-/* 经典方格已找到：浅青底 + 深青数字 */
-.cell-classic.is-found {
-  background: var(--tiffany-soft);
-  color: var(--tiffany-dark) !important;
 }
 
 /* ==========================================================================
@@ -396,15 +368,13 @@ button {
   animation: shake .3s ease;
 }
 
-.cell.is-wrong .cell-shape,
-.cell-classic.is-wrong {
+.cell.is-wrong .cell-shape {
   fill: var(--wrong-soft);
   stroke: var(--wrong);
 }
 
-.cell-classic.is-wrong {
-  color: var(--wrong);
-  background: var(--wrong-soft);
+.cell.is-wrong .cell-text {
+  fill: var(--wrong);
 }
 
 @keyframes shake {
@@ -495,7 +465,8 @@ button {
 
 .modal {
   width: min(100%, 460px);
-  max-height: calc(100dvh - 40px);
+  max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px); /* 渐进增强 */
   overflow-y: auto;
   background: var(--bg-card);
   border-radius: var(--radius-modal);
@@ -724,7 +695,8 @@ button {
   .stat-card__value { font-size: 19px; }
 
   .board-frame {
-    width: min(96vw, calc(100dvh - 300px));
+    width: min(96vw, calc(100vh - 300px));
+    width: min(96vw, calc(100dvh - 300px)); /* 渐进增强 */
     padding: 6px;
     border-radius: 16px;
   }

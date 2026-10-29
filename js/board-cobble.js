@@ -7,7 +7,7 @@
  *   - 填充马卡龙色盘（蜜桃/薰衣草/薄荷/奶油/樱粉/雾蓝），无描边。
  * ========================================================================== */
 import { shuffle, range } from './config';
-import { svgUtil } from './boards';
+import { svgUtil } from './svg-util';
 import { voronoi } from './voronoi';
 
   var SHRINK = 0.905; // 收缩系数：越小缝隙越大

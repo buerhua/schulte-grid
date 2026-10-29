@@ -1,39 +1,15 @@
 [project]
 entrypoint = "index.html"
-requires = [ "python-3.12" ]
+requires = ["nodejs-24"]
 project_type = "web"
-template = "native-static"
+template = "vite"
 version = "0.1.8"
-appliedPatches = [ ]
+appliedPatches = []
 
 [dev]
-build = [ ]
-run = [
-  "sh",
-  "-c",
-  "exec python3 -m http.server ${DEPLOY_RUN_PORT} --bind 0.0.0.0"
-]
-run_win = [
-  "powershell.exe",
-  "-NoProfile",
-  "-ExecutionPolicy",
-  "Bypass",
-  "-File",
-  "./scripts/serve.ps1"
-]
+build = ["pnpm", "install"]
+run = ["pnpm", "run", "dev"]
 
 [deploy]
-build = [ ]
-run = [
-  "sh",
-  "-c",
-  "exec python3 -m http.server ${DEPLOY_RUN_PORT} --bind 0.0.0.0"
-]
-run_win = [
-  "powershell.exe",
-  "-NoProfile",
-  "-ExecutionPolicy",
-  "Bypass",
-  "-File",
-  "./scripts/serve.ps1"
-]
+build = ["pnpm", "run", "build"]
+run = ["pnpm", "run", "preview"]

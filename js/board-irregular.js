@@ -7,7 +7,7 @@
  *   - 数字置于每个多边形的重心，字号随等效半径自适应。
  * ========================================================================== */
 import { shuffle, range } from './config';
-import { svgUtil } from './boards';
+import { svgUtil } from './svg-util';
 import {voronoi} from './voronoi';
 
   /**
